@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "xyz.groundtruths/groundtruth",
+  "description": "Sealed launch outcomes and creator records for Solana and Robinhood Chain. Every figure carries N.",
+  "version": "1.0.0",
+  "websiteUrl": "https://groundtruths.xyz/methodology",
+  "repository": {
+    "url": "https://github.com/groundtruth-now/groundtruth-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.groundtruths.xyz/mcp"
+    }
+  ]
+}
