@@ -22,8 +22,11 @@ Say what was recorded: how many launches, how many rugged or died, and the chain
 
 x402 price: **$0.01 USDC per call**, on Solana mainnet or Base. Or send an API key as `x-api-key`.
 
-**Solana Agent Kit:** `npm install github:groundtruth-now/solana-agent-kit-plugin-groundtruth`
+**Solana Agent Kit:** `npm install solana-agent-kit-plugin-groundtruth`
 (actions: creator record, CA record, known-bad flag; keyed or x402 from the agent's own wallet).
+
+**ElizaOS:** `npm install @groundtruth-now/plugin-groundtruth`
+(actions: coin record, creator record, venue figures; x402 paying-fetch supported).
 
 ## MCP tools
 
