@@ -124,6 +124,14 @@ amount to `cpCDBTacxDtgXpKNCeK4WgtCT2EcGRG3GD9rjQYayTP`.
 }
 ```
 
+## 5. Bankr
+
+Tell your Bankr agent:
+
+```
+install the skill at https://github.com/groundtruth-now/groundtruth-mcp/tree/main/skills/groundtruth
+```
+
 ## Facilitators
 
 Per chain, because bazaars index per facilitator:
