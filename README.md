@@ -124,6 +124,31 @@ amount to `cpCDBTacxDtgXpKNCeK4WgtCT2EcGRG3GD9rjQYayTP`.
 }
 ```
 
+## 4b. Use GT inside Grok
+
+GT's MCP is a remote server (streamable HTTP). Grok takes it three ways:
+
+- **grok.com** (paid Grok plans): Connectors → New Connector → Custom. URL: `https://api.groundtruths.xyz/mcp`.
+  Header (optional, lifts the keyless 5 calls/day): `x-api-key: gt_live_...`
+- **Grok Bot**: Settings → Plugins → add. Name `groundtruth`, URL `https://api.groundtruths.xyz/mcp`, same optional header.
+- **xAI API** (remote MCP tool):
+
+```python
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import mcp
+
+chat = Client().chat.create(
+    model="grok-4.7",
+    tools=[mcp(server_url="https://api.groundtruths.xyz/mcp", server_label="groundtruth",
+               extra_headers={"x-api-key": "gt_live_..."})],
+)
+chat.append(user("Scan this pump.fun coin: <mint>"))
+print(chat.sample().content)
+```
+
+Free key: https://groundtruths.xyz/account (1,000 calls a month). Without a key: 5 calls a day per IP.
+
 ## 5. Bankr
 
 Tell your Bankr agent:
