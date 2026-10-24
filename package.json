@@ -1,0 +1,16 @@
+{
+  "name": "groundtruth-mcp",
+  "version": "1.1.0",
+  "description": "GROUNDTRUTH MCP server (stdio): dev history for Solana (pump.fun) and Robinhood Chain memecoins, every count with its N.",
+  "type": "module",
+  "bin": { "groundtruth-mcp": "src/index.js" },
+  "main": "src/index.js",
+  "files": ["src"],
+  "scripts": { "start": "node src/index.js" },
+  "engines": { "node": ">=18" },
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/groundtruth-now/groundtruth-mcp.git" },
+  "homepage": "https://groundtruths.xyz",
+  "keywords": ["mcp", "model-context-protocol", "solana", "pump.fun", "robinhood-chain", "memecoin", "x402"],
+  "dependencies": { "@modelcontextprotocol/sdk": "1.32.2" }
+}

@@ -1,7 +1,29 @@
 # GROUNDTRUTH MCP + x402
 
-Sealed launch outcomes and creator records for Solana (pump.fun) and Robinhood
-Chain. Paid per call over [x402](https://x402.org), or free to connect over MCP.
+Dev history for Solana (pump.fun) and Robinhood Chain memecoins: what a creator
+wallet launched and how each coin ended. Every count carries its N.
+Paid per call over [x402](https://x402.org), or free to connect over MCP.
+
+## Run it
+
+Remote (no install): `https://api.groundtruths.xyz/mcp` (streamable HTTP).
+
+Local stdio server (this repo, `src/index.js`):
+
+```bash
+npx -y github:groundtruth-now/groundtruth-mcp
+# or
+docker build -t groundtruth-mcp . && docker run -i --rm groundtruth-mcp
+```
+
+```json
+{ "mcpServers": { "groundtruth": { "command": "npx", "args": ["-y", "github:groundtruth-now/groundtruth-mcp"] } } }
+```
+
+Keyless: 5 free calls per IP per day. Optional env: `GROUNDTRUTH_API_KEY` (sent as `x-api-key`),
+`GROUNDTRUTH_MCP_URL` (upstream override). The tool list is served live by the API, so it never drifts.
+
+The examples below were captured 2026-09-20T21:16:50Z from the live endpoint, not typed by hand.
 
 Every figure carries its N and its basis. Captured 2026-09-20T21:16:50Z from the live endpoint —
 nothing in this file is typed by hand.

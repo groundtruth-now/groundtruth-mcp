@@ -1,6 +1,9 @@
-# GROUNDTRUTH MCP over stdio. Keyless: no secrets, no env.
-# Bridges stdio to the live remote server at https://api.groundtruths.xyz/mcp.
+# GROUNDTRUTH MCP server over stdio (src/index.js). Keyless: no secrets needed.
+# Optional env: GROUNDTRUTH_API_KEY (x-api-key), GROUNDTRUTH_MCP_URL (upstream override).
 FROM node:22-alpine
-RUN npm install -g mcp-remote@0.15.2 && npm cache clean --force
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY src ./src
 USER node
-ENTRYPOINT ["mcp-remote", "https://api.groundtruths.xyz/mcp"]
+ENTRYPOINT ["node", "src/index.js"]
