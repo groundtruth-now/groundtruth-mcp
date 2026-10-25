@@ -1,5 +1,5 @@
 # GROUNDTRUTH MCP server over stdio (src/index.js). Keyless: no secrets needed.
-# Optional env: GROUNDTRUTH_API_KEY (x-api-key), GROUNDTRUTH_MCP_URL (upstream override).
+# Optional env: GROUNDTRUTH_API_KEY (x-api-key).
 FROM node:22-alpine
 WORKDIR /app
 COPY package.json package-lock.json ./

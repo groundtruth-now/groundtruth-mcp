@@ -1,197 +1,70 @@
-# GROUNDTRUTH MCP + x402
+# groundtruth-mcp
 
-Dev history for Solana (pump.fun) and Robinhood Chain memecoins: what a creator
-wallet launched and how each coin ended. Every count carries its N.
-Paid per call over [x402](https://x402.org), or free to connect over MCP.
+MCP server (stdio) for GROUNDTRUTH: dev history for Solana (pump.fun) and Robinhood Chain memecoins.
+What a creator wallet launched and how each coin ended. Every count carries its N.
 
-## Run it
+All tools are defined in [`src/index.js`](src/index.js). Each one is a direct call to the public
+GROUNDTRUTH REST API (`https://api.groundtruths.xyz`).
 
-Remote (no install): `https://api.groundtruths.xyz/mcp` (streamable HTTP).
+## Tools
 
-Local stdio server (this repo, `src/index.js`):
+- `groundtruth_scan_coin`: What the KOL wallet launched, and how it ended.
+- `groundtruth_screen_creator`: Given one creator address, return every wallet that was early in that creator's launches: the role each played (creator, repeat_buyer,...
+- `groundtruth_screen_batch`: Screen up to 200 creator addresses in ONE call and get one compact row each: launches, rug rate, the chain baseline, the multiple of...
+- `groundtruth_creator_flag`: What the KOL wallet launched, and how it ended.
+- `groundtruth_wallet_record`: One WALLET in, its counts out, from GROUNDTRUTH's own Solana capture tape (not a third party feed).
+- `groundtruth_copycheck`: For a copy bot about to follow a wallet into a coin: the coin's creator counts (to that coin's launch when we have them), the wallet's...
+- `groundtruth_kol_board`: What the KOL wallet launched, and how it ended.
+- `groundtruth_pad_hoppers`: PAD HOPPERS: devs who rugged on 2+ launchpads (pump.fun, Meteora DBC, StonkFun, letsbonk.fun, Raydium LaunchLab, Moonshot, bags.fun, and...
+- `groundtruth_kol_feed`: What the KOL wallet launched, and how it ended.
+- `groundtruth_scoreboard`: Return the public accuracy scoreboard: how many forward calls GROUNDTRUTH has made, how many have resolved, and how those resolved.
+- `groundtruth_census_figures`: Return the corpus-level figures the site publishes: launches captured per chain, how many resolved, and the share that rugged, died,...
+- `groundtruth_time_to_rug`: WITHDRAWN 2026-09-29: the bands did not beat an age-matched baseline, so this now returns nulls plus band_withdrawn.
+- `groundtruth_creator_replay`: What $100 would have done across a creator's last N resolved launches.
+- `groundtruth_seal_call`: Stamp a verdict ahead of the outcome, so it can be counted later.
+- `groundtruth_scorecard`: How often calls stamped under this API key were right.
+- `groundtruth_autopsy_index`: List the dated autopsies GROUNDTRUTH has published.
+- `launch_feed`: GT Launch Feed: GT's RPC-style stream, with GT's data already embedded (not a JSON-RPC endpoint: no RPC methods).
+- `beat_the_bot`: Beat the Bot: fight SWAPNUTZ, GT's paper sniper, on a live pump.fun launch.
+
+## Install and run
 
 ```bash
 npx -y github:groundtruth-now/groundtruth-mcp
-# or
-docker build -t groundtruth-mcp . && docker run -i --rm groundtruth-mcp
 ```
 
-```json
-{ "mcpServers": { "groundtruth": { "command": "npx", "args": ["-y", "github:groundtruth-now/groundtruth-mcp"] } } }
-```
-
-Keyless: 5 free calls per IP per day. Optional env: `GROUNDTRUTH_API_KEY` (sent as `x-api-key`),
-`GROUNDTRUTH_MCP_URL` (upstream override). The tool list is served live by the API, so it never drifts.
-
-The examples below were captured 2026-09-20T21:16:50Z from the live endpoint, not typed by hand.
-
-Every figure carries its N and its basis. Captured 2026-09-20T21:16:50Z from the live endpoint —
-nothing in this file is typed by hand.
-
-## Two paths, one price
-
-| path | behaviour |
-|---|---|
-| `/v1/flag`, `/v1/record` | **5 free calls per IP per day**, then 402. For agents evaluating the product. |
-| `/x402/v1/flag`, `/x402/v1/record` | **always 402** until paid. This is what a bazaar validator must probe — a free trial returns 200 and makes a resource undiscoverable. |
-
-Same resource, same price, one constant in the worker.
-
-## 1. Unpaid: the 402 challenge
-
-```bash
-curl -i 'https://api.groundtruths.xyz/x402/v1/flag?addr=0xdfe781868f58901c45c9507cc776be8c2f1c18dd'
-```
-
-```http
-HTTP/1.1 402 Payment Required
-PAYMENT-REQUIRED: eyJ4NDAyVmVyc2lvbiI6MiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuZ3JvdW5kdHJ1dGhzLnh5ei94NDAyL3Yx…
-```
-
-```json
-{
-  "x402Version": 2,
-  "resource": {
-    "url": "https://api.groundtruths.xyz/x402/v1/flag"
-  },
-  "accepts": [
-    {
-      "scheme": "exact",
-      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
-      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-      "amount": "10000",
-      "payTo": "cpCDBTacxDtgXpKNCeK4WgtCT2EcGRG3GD9rjQYayTP",
-      "maxTimeoutSeconds": 300
-    },
-    {
-      "scheme": "exact",
-      "network": "eip155:8453",
-      "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-      "amount": "10000",
-      "payTo": "0x90a5Feb81C67FB70508158A81598363c560Cba29",
-      "maxTimeoutSeconds": 300,
-      "extra": {
-        "name": "USD Coin",
-        "version": "2"
-      }
-    }
-  ]
-}
-```
-
-Two chains are offered. The payer picks; each settles through its own facilitator.
-
-## 2. Paid: the record
-
-Sign the requirement and send the payload back in `PAYMENT-SIGNATURE`. Any x402
-client does this for you.
-
-```bash
-curl -H 'PAYMENT-SIGNATURE: <base64 payload>' \
-  'https://api.groundtruths.xyz/x402/v1/flag?addr=0xdfe781868f58901c45c9507cc776be8c2f1c18dd'
-```
-
-```json
-{
-  "creator": "0xdfe781868f58901c45c9507cc776be8c2f1c18dd",
-  "chain": "rh",
-  "known_bad": false,
-  "launched": 856,
-  "rugged": 12,
-  "died": 367,
-  "active": 7,
-  "survived": 1,
-  "other": 469,
-  "graduated": 0,
-  "resolved": 380,
-  "rug_rate": 0.0316,
-  "failure_rate": 0.9974,
-  "population_failure_median": 1,
-  "population_ranked_n": 891,
-  "counts_sum_to_launched": true,
-  "asof": "2026-09-19T15:54:11Z",
-  "known_bad_basis": {
-    "rule": "in the published set AND resolved >= min_resolved AND rug rate >= multiple_of_baseline times the chain baseline rug rate",
-    "min_resolved": 5,
-    "multiple_of_baseline": 1.5,
-    "null_means": "not in the published set. Absence is not innocence -- this is market data we have captured, not a census of the chain."
-  },
-  "note": "counts from launches we can attribute to this creator in the market data we have captured. Not a rating. failure_rate counts rugged and died together over the resolved launches -- the practical \"these coins ended up worthless\" figure."
-}
-```
-
-**This is a real captured response.** It was returned by a settled payment on Base
-mainnet (`HTTP 200`, `x-x402-paid: 1`) that moved 0.01 USDC on-chain from the payer to
-`0x90a5Feb81C67FB70508158A81598363c560Cba29`. The Solana leg returns the same body and settled the same
-amount to `cpCDBTacxDtgXpKNCeK4WgtCT2EcGRG3GD9rjQYayTP`.
-
-## 3. Paying it
-
-- **Base** (`eip155:8453`) — USDC, EIP-3009 `transferWithAuthorization`.
-  A signed message: the payer needs **no ETH**, the facilitator submits and pays gas.
-- **Solana** (`solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp`) — USDC SPL transfer with the facilitator as
-  fee payer, so the payer needs **no SOL**. The transaction must carry exactly three
-  instructions in order: `SetComputeUnitLimit`, `SetComputeUnitPrice`, transfer.
-
-## 4. MCP client config
+Claude Desktop (`claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
     "groundtruth": {
-      "type": "streamable-http",
-      "url": "https://api.groundtruths.xyz/mcp"
+      "command": "npx",
+      "args": ["-y", "github:groundtruth-now/groundtruth-mcp"]
     }
   }
 }
 ```
 
-## 4b. Use GT inside Grok
+Docker:
 
-GT's MCP is a remote server (streamable HTTP). Grok takes it three ways:
-
-- **grok.com** (paid Grok plans): Connectors → New Connector → Custom. URL: `https://api.groundtruths.xyz/mcp`.
-  Header (optional, lifts the keyless 5 calls/day): `x-api-key: gt_live_...`
-- **Grok Bot**: Settings → Plugins → add. Name `groundtruth`, URL `https://api.groundtruths.xyz/mcp`, same optional header.
-- **xAI API** (remote MCP tool):
-
-```python
-from xai_sdk import Client
-from xai_sdk.chat import user
-from xai_sdk.tools import mcp
-
-chat = Client().chat.create(
-    model="grok-4.7",
-    tools=[mcp(server_url="https://api.groundtruths.xyz/mcp", server_label="groundtruth",
-               extra_headers={"x-api-key": "gt_live_..."})],
-)
-chat.append(user("Scan this pump.fun coin: <mint>"))
-print(chat.sample().content)
+```bash
+docker build -t groundtruth-mcp .
+docker run -i --rm groundtruth-mcp
 ```
 
-Free key: https://groundtruths.xyz/account (1,000 calls a month). Without a key: 5 calls a day per IP.
+## Environment
 
-## 5. Bankr
+| variable | required | use |
+|---|---|---|
+| `GROUNDTRUTH_API_KEY` | no | sent as `x-api-key`. Free key at https://groundtruths.xyz/api. Needed for `groundtruth_seal_call`, `groundtruth_scorecard`, `launch_feed` and `beat_the_bot` orders; higher limits elsewhere. |
 
-Tell your Bankr agent:
+Without a key the read tools work on the free per-IP allowance.
 
-```
-install the skill at https://github.com/groundtruth-now/groundtruth-mcp/tree/main/skills/groundtruth
-```
+## Also
 
-## Facilitators
+- Agent skill: [`skill.md`](skill.md), [`skills/groundtruth`](skills/groundtruth)
+- Pay per call over [x402](https://x402.org): `/x402/v1/flag`, `/x402/v1/record` on the same API
+- Site: https://groundtruths.xyz
 
-Per chain, because bazaars index per facilitator:
-
-- **Base → CDP Facilitator.** Settling here is what puts the resource in Coinbase's
-  Bazaar; a PayAI settle only ever reaches PayAI's catalog.
-- **Solana → PayAI.** Chosen by querying `/supported` rather than from documentation:
-  the public x402.org facilitator is testnet-only on EVM.
-
-The resource passes CDP's validator **25/25**, `valid: true`,
-`simulation.outcome: "accepted"`.
-
-## Methodology
-
-<https://groundtruths.xyz/methodology> — the base rate, the known_bad rule, and what is
-excluded from every denominator.
+MIT licensed.

@@ -1,6 +1,6 @@
 {
   "name": "groundtruth-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "GROUNDTRUTH MCP server (stdio): dev history for Solana (pump.fun) and Robinhood Chain memecoins, every count with its N.",
   "type": "module",
   "bin": { "groundtruth-mcp": "src/index.js" },
