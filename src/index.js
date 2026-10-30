@@ -13,7 +13,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 const BASE = (process.env.GROUNDTRUTH_API_BASE || "https://api.groundtruths.xyz").replace(/\/+$/, "");
-const VERSION = "1.2.0";
+const VERSION = "1.3.0";
 
 export const TOOLS = [
   {
@@ -504,6 +504,18 @@ export const TOOLS = [
       "idempotentHint": false,
       "openWorldHint": true
     }
+  },
+  {
+    "name": "line_check_board",
+    "description": "LINE CHECK: who is buying the prediction-market line. Polymarket games starting in the next 72 h and the US midterm race board (Nov 3): per market, the side with the most fresh-or-clustered money, its $ and wallets (k of N), price, HEAT 0-100 with its N, and the pre-start stamp hash. Counts from the Polygon chain. Information only, not financial advice.",
+    "inputSchema": { "type": "object", "properties": {} },
+    "annotations": { "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": true }
+  },
+  {
+    "name": "market_heat",
+    "description": "HEAT for one Polymarket market (condition id): the share of a side's $ from fresh or clustered wallets, ranked 0-100 against sides with real money (>= $1,000 on the side and some fresh-or-clustered $), with N. heat is null (with the reason) when the market has none. Information only, not financial advice.",
+    "inputSchema": { "type": "object", "properties": { "cid": { "type": "string", "description": "Polymarket condition id: 0x + 64 hex" } }, "required": ["cid"] },
+    "annotations": { "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": true }
   }
 ];
 
@@ -542,6 +554,8 @@ const HANDLERS = {
   }),
   groundtruth_scorecard: (a) => ({ path: "/v1/scorecard", query: { limit: s(a.limit) } }),
   launch_feed: (a) => ({ path: "/v1/launches", query: { n: s(a.n), chain: s(a.chain) } }),
+  line_check_board: () => ({ path: "/v1/linecheck" }),
+  market_heat: (a) => (need(a, "cid"), { path: "/v1/heat", query: { cid: s(a.cid) } }),
   beat_the_bot: (a) => {
     const act = s(a.action) || "state";
     const { action, ...rest } = a;

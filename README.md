@@ -26,6 +26,8 @@ GROUNDTRUTH REST API (`https://api.groundtruths.xyz`).
 - `groundtruth_autopsy_index`: List the dated autopsies GROUNDTRUTH has published.
 - `launch_feed`: GT Launch Feed: GT's RPC-style stream, with GT's data already embedded (not a JSON-RPC endpoint: no RPC methods).
 - `beat_the_bot`: Beat the Bot: fight SWAPNUTZ, GT's paper sniper, on a live pump.fun launch.
+- `line_check_board`: LINE CHECK: who's buying the prediction-market line (Polymarket games next 72 h + the midterm race board), HEAT 0-100 with its N.
+- `market_heat`: HEAT for one Polymarket market (condition id), with N; null + the reason when the market has none.
 
 ## Install and run
 
