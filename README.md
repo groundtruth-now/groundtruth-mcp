@@ -1,72 +1,73 @@
-# groundtruth-mcp
+# GROUNDTRUTH MCP + x402
 
-MCP server (stdio) for GROUNDTRUTH: dev history for Solana (pump.fun) and Robinhood Chain memecoins.
-What a creator wallet launched and how each coin ended. Every count carries its N.
+Who is buying the prediction-market line. Polymarket wallet records, the market board (who is in, per market),
+GT line vs Smart-money line gaps, and the smart-money entry feed. Counts from the Polygon chain, each with its
+sample size. Paid per call over [x402](https://x402.org) (USDC on Base or Solana), or free to connect over MCP.
 
-All tools are defined in [`src/index.js`](src/index.js). Each one is a direct call to the public
-GROUNDTRUTH REST API (`https://api.groundtruths.xyz`).
+The memecoin tools are paused; everything below is prediction-market data.
 
-## Tools
+## Price table
 
-- `groundtruth_scan_coin`: What the KOL wallet launched, and how it ended.
-- `groundtruth_screen_creator`: Given one creator address, return every wallet that was early in that creator's launches: the role each played (creator, repeat_buyer,...
-- `groundtruth_screen_batch`: Screen up to 200 creator addresses in ONE call and get one compact row each: launches, rug rate, the chain baseline, the multiple of...
-- `groundtruth_creator_flag`: What the KOL wallet launched, and how it ended.
-- `groundtruth_wallet_record`: One WALLET in, its counts out, from GROUNDTRUTH's own Solana capture tape (not a third party feed).
-- `groundtruth_copycheck`: For a copy bot about to follow a wallet into a coin: the coin's creator counts (to that coin's launch when we have them), the wallet's...
-- `groundtruth_kol_board`: What the KOL wallet launched, and how it ended.
-- `groundtruth_pad_hoppers`: PAD HOPPERS: devs who rugged on 2+ launchpads (pump.fun, Meteora DBC, StonkFun, letsbonk.fun, Raydium LaunchLab, Moonshot, bags.fun, and...
-- `groundtruth_kol_feed`: What the KOL wallet launched, and how it ended.
-- `groundtruth_scoreboard`: Return the public accuracy scoreboard: how many forward calls GROUNDTRUTH has made, how many have resolved, and how those resolved.
-- `groundtruth_census_figures`: Return the corpus-level figures the site publishes: launches captured per chain, how many resolved, and the share that rugged, died,...
-- `groundtruth_time_to_rug`: WITHDRAWN 2026-09-29: the bands did not beat an age-matched baseline, so this now returns nulls plus band_withdrawn.
-- `groundtruth_creator_replay`: What $100 would have done across a creator's last N resolved launches.
-- `groundtruth_seal_call`: Stamp a verdict ahead of the outcome, so it can be counted later.
-- `groundtruth_scorecard`: How often calls stamped under this API key were right.
-- `groundtruth_autopsy_index`: List the dated autopsies GROUNDTRUTH has published.
-- `launch_feed`: GT Launch Feed: GT's RPC-style stream, with GT's data already embedded (not a JSON-RPC endpoint: no RPC methods).
-- `beat_the_bot`: Beat the Bot: fight SWAPNUTZ, GT's paper sniper, on a live pump.fun launch.
-- `line_check_board`: LINE CHECK: who's buying the prediction-market line (Polymarket games next 72 h + the midterm race board), HEAT 0-100 with its N.
-- `market_heat`: HEAT for one Polymarket market (condition id), with N; null + the reason when the market has none.
+| route | what | price (USDC) | free |
+|---|---|---|---|
+| `/x402/v1/pm/wallet?addr=0x..` | one wallet's record: won X of Y, P&L, tag | $0.01 | none |
+| `/x402/v1/pm/board` | who is in, per market | $0.05 | top 3 per board |
+| `/x402/v1/pm/edges` | GT line vs Smart-money line gaps | $0.03 | top 3 |
+| `/x402/v1/pm/entries` | smart-money entries | $0.05 | newest 3 |
 
-## Install and run
+`/x402/...` is the **always-402** door a bazaar validator probes. `/v1/pm/...` answers the free rows without a
+payment and a 402 for the rest. Same prices, one constant in the worker.
+
+## 1. Unpaid: the 402 challenge
 
 ```bash
-npx -y github:groundtruth-now/groundtruth-mcp
+curl -i 'https://api.groundtruths.xyz/x402/v1/pm/board'
 ```
 
-Claude Desktop (`claude_desktop_config.json`):
+## 2. Paid: the board
+
+Sign the requirement and send the payload back in `PAYMENT-SIGNATURE` (any x402 client does this; `@x402/fetch` works):
+
+```bash
+curl -s -H 'PAYMENT-SIGNATURE: <base64 payload>' 'https://api.groundtruths.xyz/x402/v1/pm/board'
+```
+
+Each market comes back with its sides, price, $ and wallets, the tagged wallets holding each side
+(SMART MONEY / WHALE / BOT/MM), the GT line and the Smart-money line. No sportsbook odds and no Kalshi price
+ever ride these routes.
+
+## 3. Paying
+
+- **Base** (`eip155:8453`): USDC, EIP-3009 `transferWithAuthorization`. A signed message: the payer needs no ETH.
+- **Solana** (`solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp`): USDC SPL transfer with the facilitator as fee payer, so the
+  payer needs no SOL. Exactly three instructions in order: `SetComputeUnitLimit`, `SetComputeUnitPrice`, transfer.
+
+## 4. MCP client config
 
 ```json
 {
   "mcpServers": {
     "groundtruth": {
-      "command": "npx",
-      "args": ["-y", "github:groundtruth-now/groundtruth-mcp"]
+      "type": "streamable-http",
+      "url": "https://api.groundtruths.xyz/mcp"
     }
   }
 }
 ```
 
-Docker:
+Tools: `pm_market_board`, `pm_edges`, `pm_smart_money_entries`, `pm_wallet_record`, `line_check_board`, `market_heat`.
+Optional header `x-api-key: gt_live_...` (free key: https://groundtruths.xyz/account). Without a key: the free rows.
 
-```bash
-docker build -t groundtruth-mcp .
-docker run -i --rm groundtruth-mcp
+## 5. Bankr
+
+```
+install the skill at https://github.com/groundtruth-now/groundtruth-mcp/tree/main/skills/groundtruth
 ```
 
-## Environment
+## Facilitators
 
-| variable | required | use |
-|---|---|---|
-| `GROUNDTRUTH_API_KEY` | no | sent as `x-api-key`. Free key at https://groundtruths.xyz/api. Needed for `groundtruth_seal_call`, `groundtruth_scorecard`, `launch_feed` and `beat_the_bot` orders; higher limits elsewhere. |
+Per chain, because bazaars index per facilitator: **Base -> CDP**, **Solana -> PayAI**.
 
-Without a key the read tools work on the free per-IP allowance.
+## How we keep score
 
-## Also
-
-- Agent skill: [`skill.md`](skill.md), [`skills/groundtruth`](skills/groundtruth)
-- Pay per call over [x402](https://x402.org): `/x402/v1/flag`, `/x402/v1/record` on the same API
-- Site: https://groundtruths.xyz
-
-MIT licensed.
+<https://groundtruths.xyz/boring#linecheck>. A record belongs to a wallet, not a person. Information only, not financial advice.
